@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acadex - Premium Study Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#f0fdf4', 500: '#10b981', 600: '#059669', 700: '#047857' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; background-color: #030712; color: #f8fafc; }
+        .glass-card { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .drawer-backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 backdrop-blur-xl bg-slate-950/90 border-b border-slate-900 shadow-2xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+            <div class="flex items-center space-x-3 cursor-pointer shrink-0" onclick="showSection('home')">
+                <div class="bg-gradient-to-tr from-emerald-600 to-teal-400 p-2.5 rounded-2xl shadow-lg shadow-emerald-500/20">
+                    <i class="fa-solid fa-graduation-cap text-white text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-black tracking-wider bg-gradient-to-r from-white via-slate-200 to-emerald-400 bg-clip-text text-transparent">Acadex</span>
+                    <span class="block text-[9px] text-emerald-400 font-bold tracking-widest uppercase">Created by Nupur Thakre</span>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="flex-1 max-w-md hidden sm:block">
+                <div class="relative w-full">
+                    <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+                    <input type="text" id="searchInput" oninput="filterStudyItems()" placeholder="Search notes or MCQs..." class="w-full bg-slate-900/80 border border-slate-800 rounded-full pl-11 pr-4 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500 transition shadow-inner">
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3 shrink-0">
+                <button onclick="toggleMenuDrawer()" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 transition shadow-md flex items-center space-x-2 cursor-pointer">
+                    <i class="fa-solid fa-bars text-emerald-400 text-base"></i>
+                    <span class="text-xs font-bold uppercase tracking-wider hidden sm:inline">Menu</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- SLIDE-OUT MENU DRAWER -->
+    <div id="menuDrawer" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 drawer-backdrop" onclick="toggleMenuDrawer()"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-80 bg-slate-900 border-l border-slate-800 p-6 flex flex-col justify-between shadow-2xl transition-transform">
+            <div class="space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-compass text-emerald-400 text-lg"></i>
+                        <span class="font-bold text-base text-white">Acadex Menu</span>
+                    </div>
+                    <button onclick="toggleMenuDrawer()" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs cursor-pointer">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
+
+                <nav class="space-y-2 text-xs font-semibold">
+                    <button onclick="showSection('home'); toggleMenuDrawer();" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-slate-800/60 hover:bg-emerald-600/20 hover:text-emerald-400 text-slate-200 transition text-left cursor-pointer">
+                        <i class="fa-solid fa-house w-5 text-emerald-400 text-sm"></i>
+                        <span>Home Dashboard</span>
+                    </button>
+                    <button onclick="verifyAdminAccess(); toggleMenuDrawer();" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-slate-800/60 hover:bg-emerald-600/20 hover:text-emerald-400 text-slate-200 transition text-left cursor-pointer">
+                        <i class="fa-solid fa-lock w-5 text-emerald-400 text-sm"></i>
+                        <span>Admin Panel</span>
+                    </button>
+                    <button onclick="verifySourceCodeAccess(); toggleMenuDrawer();" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-slate-800/60 hover:bg-emerald-600/20 hover:text-emerald-400 text-slate-200 transition text-left cursor-pointer">
+                        <i class="fa-solid fa-code w-5 text-amber-400 text-sm"></i>
+                        <span>Source Code Manager</span>
+                    </button>
+                    <a href="#requestSection" onclick="toggleMenuDrawer()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-slate-800/60 hover:bg-emerald-600/20 hover:text-emerald-400 text-slate-200 transition text-left">
+                        <i class="fa-solid fa-comments w-5 text-cyan-400 text-sm"></i>
+                        <span>Student Request & Feedback</span>
+                    </a>
+                    <a href="#charitySection" onclick="toggleMenuDrawer()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-slate-800/60 hover:bg-emerald-600/20 hover:text-emerald-400 text-slate-200 transition text-left">
+                        <i class="fa-solid fa-heart w-5 text-red-400 text-sm"></i>
+                        <span>Shiksha Daan (Charity)</span>
+                    </a>
+                </nav>
+            </div>
+            
+            <div class="border-t border-slate-800 pt-4 text-center text-[10px] text-slate-500">
+                <p>Acadex App v5.1 • Stable Release</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6">
+
+        <div id="homeSection" class="space-y-6">
+            <!-- Filter Bar Box -->
+            <div class="glass-card p-4 rounded-3xl space-y-4 shadow-xl border border-slate-800/80">
+                <div class="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-none">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest shrink-0 mr-2"><i class="fa-solid fa-filter text-emerald-400 mr-1"></i> Type:</span>
+                    <button onclick="setFilterType('All')" id="typeAll" class="px-4 py-2 rounded-full text-xs font-bold bg-emerald-600 text-white shadow-md shrink-0 transition cursor-pointer">All Files</button>
+                    <button onclick="setFilterType('Notes')" id="typeNotes" class="px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 shrink-0 transition cursor-pointer">Study Notes</button>
+                    <button onclick="setFilterType('MCQ')" id="typeMCQ" class="px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 shrink-0 transition cursor-pointer">MCQ DPP</button>
+                </div>
+                <div class="flex items-center space-x-2 overflow-x-auto pt-2 border-t border-slate-800/60 scrollbar-none">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest shrink-0 mr-2"><i class="fa-solid fa-graduation-cap text-emerald-400 mr-1"></i> Class:</span>
+                    <button onclick="setFilterClass('All')" id="classAll" class="px-4 py-2 rounded-full text-xs font-bold bg-emerald-600 text-white shadow-md shrink-0 transition cursor-pointer">All Classes</button>
+                    <button onclick="setFilterClass('Class 10')" id="class10" class="px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 shrink-0 transition cursor-pointer">Class 10</button>
+                    <button onclick="setFilterClass('Class 11')" id="class11" class="px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 shrink-0 transition cursor-pointer">Class 11</button>
+                    <button onclick="setFilterClass('Class 12')" id="class12" class="px-4 py-2 rounded-full text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 shrink-0 transition cursor-pointer">Class 12</button>
+                </div>
+            </div>
+
+            <!-- Subject & Notes Grid -->
+            <div>
+                <h2 class="text-lg font-extrabold text-white flex items-center space-x-2 mb-4">
+                    <i class="fa-solid fa-layer-group text-emerald-400"></i>
+                    <span>Study Materials & Notes</span>
+                </h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="liveNotesDisplayGrid">
+                    <!-- Dynamic items rendered via JS -->
+                </div>
+            </div>
+
+            <!-- STUDENT REQUEST FORM -->
+            <div id="requestSection" class="glass-card rounded-3xl p-6 border border-slate-800 space-y-4 shadow-xl">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-3">
+                    <div class="bg-cyan-500/10 p-2.5 rounded-2xl border border-cyan-500/20 text-cyan-400">
+                        <i class="fa-solid fa-paper-plane text-base"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-bold text-white">Student PDF Request & Direct Feedback</h2>
+                        <p class="text-[11px] text-slate-400">Kisi chapter ki PDF chahiye? Seedha message bhejein!</p>
+                    </div>
+                </div>
+
+                <form action="https://formspree.io/f/mwpvdqyr" method="POST" class="space-y-3 text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-slate-400 font-semibold mb-1 uppercase text-[10px]">Aapka Naam / Class</label>
+                            <input type="text" name="student_name" required placeholder="e.g. Aman (Class 12)" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 font-semibold mb-1 uppercase text-[10px]">Subject / Chapter Name</label>
+                            <input type="text" name="subject_topic" required placeholder="e.g. Physics Chapter 3 PDF" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 font-semibold mb-1 uppercase text-[10px]">Aapka Message / Feedback</label>
+                        <textarea name="message" rows="2" required placeholder="Mujhe is chapter ke handwritten notes ki zaroorat hai..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-3 rounded-xl transition shadow-lg text-xs flex items-center justify-center space-x-2 cursor-pointer">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Send Request Directly to Nupur (Admin)</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- CHARITY BANNER WITH CUSTOM QR CODE -->
+        <div id="charitySection" class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-900 border border-emerald-500/30 p-6 shadow-2xl">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+                <div class="lg:col-span-2 space-y-3">
+                    <span class="inline-flex items-center space-x-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider">
+                        <i class="fa-solid fa-heart text-red-500 mr-1 animate-pulse"></i> Shiksha Daan Mission
+                    </span>
+                    <h2 class="text-xl font-black text-white">Garib Bachhon Ki Padhai Me Madad Karein</h2>
+                    <p id="publicDonationDesc" class="text-slate-300 text-xs leading-relaxed">
+                        Har bachhe ko padhne ka adhikar hai. Aapke chote se sahyog se kisi garib zarooratmand bachhe ki school fees aur books ka kharcha uthaya ja sakta hai.
+                    </p>
+                    <div class="bg-slate-950/80 px-3.5 py-2 rounded-xl border border-slate-800 inline-block text-xs">
+                        <span class="block text-[9px] text-slate-400 uppercase font-bold">UPI ID</span>
+                        <span id="publicUpiId" class="text-emerald-400 font-mono font-bold">support@upi</span>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center justify-center bg-slate-950/60 p-4 rounded-2xl border border-slate-800 space-y-2">
+                    <div class="w-32 h-32 bg-white p-1.5 rounded-xl shadow-inner flex items-center justify-center overflow-hidden">
+                        <img id="publicQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=support@upi" alt="QR Code" class="w-full h-full object-contain">
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-400">Scan & Pay via UPI</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN PANEL SECTION -->
+        <div id="adminSection" class="hidden max-w-4xl mx-auto space-y-6">
+            <!-- Add Study Item Panel -->
+            <div class="glass-card rounded-3xl p-6 border border-slate-800 space-y-4 shadow-2xl">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-cloud-arrow-up text-emerald-400"></i>
+                            <span>Admin Quick Add Panel</span>
+                        </h2>
+                        <p class="text-xs text-slate-400">Publish notes or MCQ DPP links instantly.</p>
+                    </div>
+                    <button onclick="showSection('home')" class="text-xs bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl transition font-semibold cursor-pointer">Back to Home</button>
+                </div>
+
+                <form onsubmit="addStudyItem(event)" class="space-y-3 text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-slate-300 font-semibold mb-1 uppercase text-[10px]">File Category</label>
+                            <select id="admCat" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200">
+                                <option value="Notes">Study Notes</option>
+                                <option value="MCQ">MCQ (D.P.P.)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-300 font-semibold mb-1 uppercase text-[10px]">Target Class</label>
+                            <select id="admClass" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200">
+                                <option value="Class 10">Class 10</option>
+                                <option value="Class 11">Class 11</option>
+                                <option value="Class 12">Class 12</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-slate-300 font-semibold mb-1 uppercase text-[10px]">Subject Name</label>
+                            <input type="text" id="admSubj" required placeholder="e.g. Physics" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1 uppercase text-[10px]">Chapter / File Title</label>
+                        <input type="text" id="admTitle" required placeholder="e.g. Chapter 1 Electrostatics Notes" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-1 uppercase text-[10px]">PDF Direct Link (Google Drive / URL)</label>
+                        <input type="url" id="admUrl" required placeholder="https://drive.google.com/..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-lg text-xs cursor-pointer">
+                        Publish Material Instantly
+                    </button>
+                </form>
+            </div>
+
+            <!-- Custom QR Code Upload Manager -->
+            <div class="glass-card rounded-3xl p-6 border border-slate-800 space-y-3 text-xs">
+                <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-qrcode text-emerald-400"></i>
+                    <span>Upload Custom Donation QR Code Image</span>
+                </h3>
+                <form onsubmit="saveCustomQr(event)" class="space-y-3">
+                    <div>
+                        <label class="block text-slate-400 font-semibold mb-1 uppercase text-[10px]">Select QR Code Image from Gallery</label>
+                        <input type="file" id="qrImageFile" accept="image/*" required class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 font-semibold mb-1 uppercase text-[10px]">UPI ID Text</label>
+                        <input type="text" id="admUpi" value="support@upi" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200">
+                    </div>
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-bold cursor-pointer"
